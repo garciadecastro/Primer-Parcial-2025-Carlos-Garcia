@@ -1,83 +1,83 @@
-// Importamos el servicio para que nos traiga los datos
-import * as services from "../../services/juegos.service.js"
+import * as services from "../../services/juegos.service.js";
 
+// Listar juegos con filtros desde query
+export function getJuegos(req, res) {
+  const filtros = {
+    nombre: req.query.nombre && req.query.nombre.trim() !== "" ? req.query.nombre : undefined,
+    categoria: req.query.categoria && req.query.categoria.trim() !== "" ? req.query.categoria : undefined,
+    editorial: req.query.editorial && req.query.editorial.trim() !== "" ? req.query.editorial : undefined,
+    precioMax: req.query.precioMax && req.query.precioMax !== "" ? Number(req.query.precioMax) : undefined
+  };
 
-export function getJuegos(req, res){
-    services.getJuegos()
-        .then ( juegos => res.status(200).json( juegos ))
+  services.getJuegos(filtros)
+    .then(juegos => res.status(200).json(juegos))
+    .catch(err => res.status(500).json({ message: "Error obteniendo juegos", error: err.message }));
 }
 
-
-
-export function getJuegoById(req, res){
-    const id = req.params.id
-    services.getJuegoById(id)
-        .then(juego => {
-            if(juego){
-                res.status(200).json(juego)
-            }else{
-                res.status(404).json({ message: "Recurso no encontrado" })
-            }
-        })
+// Obtener un juego por ID
+export function getJuegoById(req, res) {
+  const id = req.params.id;
+  services.getJuegoById(id)
+    .then(juego => {
+      if (juego) {
+        res.status(200).json(juego);
+      } else {
+        res.status(404).json({ message: "Juego no encontrado" });
+      }
+    })
+    .catch(err => res.status(500).json({ message: "Error obteniendo juego", error: err.message }));
 }
 
-
-// ACÁ VAN A IR LOS CONTROLADORES DE LA API
+// Crear un nuevo juego
 export function createJuego(req, res) {
   const juego = {
     nombre: req.body.nombre,
     editorial: req.body.editorial,
     precio: req.body.precio,
     year: req.body.year,
-    categoria: req.body.categoria
-  }
+    categoria: req.body.categoria,
+    imagen: req.body.imagen || null
+  };
 
   services.guardarJuego(juego)
-    .then((nuevoJuego) => res.status(201).json(nuevoJuego))
-    .catch(err => res.status(500).json({ message: err }))
+    .then(nuevoJuego => res.status(201).json(nuevoJuego))
+    .catch(err => res.status(500).json({ message: "Error creando juego", error: err.message }));
 }
 
-
-export function deleteJuego(req, res){
-  const id = req.params.id
-
-  services.borrarJuego(id)
-    .then((idBorrado) => 
-      res.status(202).json({ message: `el id:${id} se elimino correctamente.` })
-    )
-    .catch((err) => 
-      res.status(500).json({ message: `el id:${id} NO se elimino.` })
-    )
-}
-
-export function reemplazarJuego(req, res){
-  const id = req.params.id
+// Reemplazar (PUT) un juego
+export function reemplazarJuego(req, res) {
   const juego = {
-    id: id,
+    _id: req.params.id, // importante: _id, no id
     nombre: req.body.nombre,
     editorial: req.body.editorial,
     precio: req.body.precio,
     year: req.body.year,
-    categoria: req.body.categoria
-  }
+    categoria: req.body.categoria,
+    imagen: req.body.imagen || null
+  };
 
   services.editarJuego(juego)
     .then(juegoEditado => res.status(202).json(juegoEditado))
-    .catch(err => res.status(500).json({ message: "No se pudo actualizar" }))
+    .catch(err => res.status(500).json({ message: "Error reemplazando juego", error: err.message }));
 }
 
-export function actualizarJuego(req, res){
-  const id = req.params.id
+// Actualizar parcialmente (PATCH)
+export function actualizarJuego(req, res) {
   const juego = {
-    id: id,
-    nombre: req.body.nombre,
-    editorial: req.body.editorial,
-    precio: req.body.precio,
-    year: req.body.year,
-    categoria: req.body.categoria
-  }
+    _id: req.params.id, // importante: _id
+    ...req.body
+  };
 
   services.actualizarJuego(juego)
     .then(juegoEditado => res.status(202).json(juegoEditado))
-    .catch(err => res.status(500).json({ message: "No se pudo actualizar." }))
+    .catch(err => res.status(500).json({ message: "Error actualizando juego", error: err.message }));
+}
+
+// Borrar un juego
+export function deleteJuego(req, res) {
+  const id = req.params.id;
+
+  services.borrarJuego(id)
+    .then(() => res.status(202).json({ message: `Juego con id ${id} eliminado correctamente` }))
+    .catch(err => res.status(500).json({ message: "Error borrando juego", error: err.message }));
 }
