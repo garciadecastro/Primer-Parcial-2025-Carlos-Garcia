@@ -22,6 +22,7 @@ export function createPage(titulo, navLinks, contenido) {
             <!-- Links principales -->
             <ul class="flex space-x-6 text-lg font-bold">
               <li><a href="/juegos" class="hover:text-yellow-400">Juegos</a></li>
+              <li><a href="/juegos/nuevo" class="hover:text-yellow-400">Nuevo Juego</a></li>
               <li><a href="/jugadores" class="hover:text-yellow-400">Jugadores</a></li>
               <li><a href="/jugadores/nuevo" class="hover:text-yellow-400">Nuevo Jugador</a></li>
             </ul>

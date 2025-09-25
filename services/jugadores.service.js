@@ -6,9 +6,20 @@ const db = client.db("AH20232CP1");
 const collection = db.collection("jugadores");
 
 // Obtener todos los jugadores (que no estén eliminados)
-export async function getJugadores() {
+export async function getJugadores(filter = {}) {
   await client.connect();
-  return collection.find({ eliminado: { $ne: true } }).toArray();
+
+  const filterMongo = { eliminado: { $ne: true } };
+
+  if (filter.nombre !== undefined) {
+    filterMongo.nombre = { $regex: filter.nombre, $options: "i" }; // búsqueda parcial y case-insensitive
+  }
+
+  if (filter.descripcion !== undefined) {
+    filterMongo.descripcion = { $regex: filter.descripcion, $options: "i" };
+  }
+
+  return collection.find(filterMongo).toArray();
 }
 
 // Obtener un jugador por ID
